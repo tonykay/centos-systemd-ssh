@@ -20,7 +20,8 @@ RUN useradd vagrant && \
     mkdir -p /home/vagrant/.ssh && \
     curl -LSs https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub > /home/vagrant/.ssh/authorized_keys && \ 
     chmod 600 /home/vagrant/.ssh/authorized_keys && chmod 700 /home/vagrant/.ssh && \
-    chown -R vagrant:vagrant /home/vagrant/.ssh 
+    chown -R vagrant:vagrant /home/vagrant/.ssh && \
+    echo "vagrant ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN yum clean all && \
     systemctl enable sshd.service;
