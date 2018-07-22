@@ -38,9 +38,35 @@ docker run --rm --privileged -v /:/host tonykay/centos-systemd-ssh
 === Adding additional users
 
 The image contains the _well known_ vagrant user and their key, however this can
-easily be over-ridden.
+easily be over-ridden, for example for user `foo`.
+
+. Set `ENV user=foo`
+. Insert `foo` 's private key
+.. If private key is local consider using the Dockerfile `COPY` directive
+.. However remember to ensure resulting /home/foo/.ssh/authorized_keys
+... Belongs to `foo`
+... Has 0600 or, better, 0400 permissions
 
 
+_Key lines from Dockerfile below_
+[source,bash]
+----
+ENV user=vagrant
+
+# setup user, defaults to vagrant and ssh keys, use COPY to inject your own
+    useradd ${user:-vagrant} && \ 
+    mkdir -p /home/${user:-vagrant}/.ssh && \
+    curl -LSs
+https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub >
+/home/vagrant/.ssh/authorized_keys && \
+    chmod 600 /home/${user:-vagrant}/.ssh/authorized_keys && chmod 700
+/home/${user:-vagrant}/.ssh && \
+    chown -R ${user:-vagrant}:${user:-vagrant} /home/${user:-vagrant}/.ssh && \
+# setup passwordless sudo for user
+    echo "${user:-vagrant} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+----
+Adding multiple users is straightforward, however consider using `Ansible` for
+in-depth configuration.
 
 
 === Extras
