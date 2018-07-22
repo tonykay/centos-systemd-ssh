@@ -1,0 +1,54 @@
+== centos-systemd-ssh
+
+Docker image based on solita/centos-systemd adding sshd
+
+*This image was developed for testing ansible and not for production
+infrastructure!*
+
+It runs a CentOS 7 Container with:
+
+* systemd
+* sshd
+** Defaults to `vagrant` user with vagrant insecure key
+* sudo
+
+As such it is ideally suited for Ansible testing as a target host.
+
+=== Usage:
+
+Directly:
+
+[source,bash]
+----
+docker run -d \
+    --name centos-systemd-ssh \
+    -p 22:22 \ 
+    --security-opt seccomp=unconfined \
+    --tmpfs /run  \
+    -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+    -t tonykay/centos-systemd-ssh
+----
+
+NOTE: Docker containers running systemd need additional privilege:
+
+[source,bash]
+----
+docker run --rm --privileged -v /:/host tonykay/centos-systemd-ssh
+----
+=== Adding additional users
+
+The image contains the _well known_ vagrant user and their key, however this can
+easily be over-ridden.
+
+
+
+
+=== Extras
+
+A `ssh.cfg` is supplied for use with either *Ansible* or directly with ssh, e.g.
+
+[source,bash]
+----
+ssh -F ssh.cfg localhost
+----
+
